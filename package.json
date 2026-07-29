@@ -1,0 +1,29 @@
+{
+	"name": "zakker",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "node --experimental-strip-types esbuild.config.ts",
+		"dev": "tsx --env-file=.env --watch src/index.ts",
+		"start": "node --env-file=.env dist/index.js"
+	},
+	"keywords": [],
+	"author": "Muhammad Lutfi <mohamed10lotfy10@gmail.com>",
+	"license": "ISC",
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "11.3.0",
+			"onFail": "download"
+		}
+	},
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "^2.5.6",
+		"@types/node": "24.13.3",
+		"esbuild": "^0.28.1",
+		"tsx": "^4.23.1",
+		"typescript": "^7.0.2"
+	}
+}
