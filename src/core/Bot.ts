@@ -1,0 +1,52 @@
+import { Client, Collection, GatewayIntentBits, Partials } from "discord.js";
+import type Command from "./Command";
+import type BotEvent from "./Event";
+
+export default class Bot extends Client {
+	private initialized = false;
+	private commands = new Collection<string, Command>();
+	private events = new Collection<string, BotEvent>();
+
+	constructor(
+		private commandLoader: () => Promise<Collection<string, Command>>,
+		private eventLoader: () => Promise<Collection<string, BotEvent>>,
+	) {
+		super({
+			intents: [
+				GatewayIntentBits.Guilds,
+				GatewayIntentBits.GuildVoiceStates,
+				GatewayIntentBits.GuildMessages,
+				GatewayIntentBits.GuildPresences,
+				GatewayIntentBits.GuildMessageReactions,
+				GatewayIntentBits.DirectMessages,
+				GatewayIntentBits.GuildMembers,
+				GatewayIntentBits.MessageContent,
+			],
+
+			// listen to older/uncached on
+			partials: [
+				Partials.Channel,
+				Partials.Message,
+				Partials.User,
+				Partials.GuildMember,
+				Partials.Reaction,
+			],
+		});
+	}
+
+	async init() {
+		this.commands = await this.commandLoader();
+		// TODO: actually register the commands
+		this.events = await this.eventLoader();
+		// TODO: actually register the events
+
+		console.log(this.commands, this.events);
+
+		this.initialized = true;
+	}
+
+	async login() {
+		if (!this.initialized) await this.init();
+		return super.login(process.env.BOT_TOKEN);
+	}
+}
