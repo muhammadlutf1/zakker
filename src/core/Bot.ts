@@ -1,6 +1,6 @@
 import { Client, Collection, GatewayIntentBits, Partials } from "discord.js";
-import type Command from "./Command";
-import type BotEvent from "./Event";
+import type { Command } from "./Command";
+import type { BotEvent } from "./Event";
 
 export default class Bot extends Client {
 	private initialized = false;
@@ -37,10 +37,14 @@ export default class Bot extends Client {
 	async init() {
 		this.commands = await this.commandLoader();
 		// TODO: actually register the commands
-		this.events = await this.eventLoader();
-		// TODO: actually register the events
 
-		console.log(this.commands, this.events);
+		this.events = await this.eventLoader();
+
+		this.events.forEach((event) => {
+			if (event.once)
+				this.once(event.name, (...args) => event.execute(this, ...args));
+			else this.on(event.name, (...args) => event.execute(this, ...args));
+		});
 
 		this.initialized = true;
 	}
