@@ -1,17 +1,21 @@
-import { build } from "esbuild";
+import { glob } from "node:fs/promises";
 import { resolve } from "node:path";
+import { build } from "esbuild";
+
+const entryPoints = [];
+for await (const file of glob("src/**/*.ts")) entryPoints.push(file);
 
 await build({
-  entryPoints: ["src/index.ts"],
-  bundle: true,
-  outfile: resolve(import.meta.dirname, "dist/index.js"),
+	entryPoints,
+	bundle: false,
+	outdir: resolve(import.meta.dirname, "dist"),
 
-  platform: "node",
-  packages: "external",
+	platform: "node",
+	packages: "external",
 
-  format: "esm",
-  target: "es2024",
-  minify: true,
-  treeShaking: true,
-  logLevel: "info",
+	format: "esm",
+	target: "es2024",
+	minify: true,
+	treeShaking: true,
+	logLevel: "info",
 });
