@@ -40,7 +40,6 @@ export default class Bot extends Client {
 
 	async init() {
 		this._commands = await this.commandLoader();
-		// TODO: actually register the commands
 
 		this.events = await this.eventLoader();
 
