@@ -1,15 +1,9 @@
-import type {
-	Client,
-	CommandInteraction,
-	SlashCommandBuilder,
-} from "discord.js";
+import type { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import type Bot from "./Bot";
 
 export interface Command {
 	readonly data: SlashCommandBuilder;
-	execute(
-		client: Client,
-		interaction: CommandInteraction,
-	): Promise<void> | void;
+	execute(bot: Bot, interaction: CommandInteraction): Promise<void> | void;
 }
 
 export function isCommand(command: unknown): command is Command {

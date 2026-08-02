@@ -4,7 +4,7 @@ import type { BotEvent } from "./Event";
 
 export default class Bot extends Client {
 	private initialized = false;
-	private commands = new Collection<string, Command>();
+	private _commands = new Collection<string, Command>();
 	private events = new Collection<string, BotEvent>();
 
 	constructor(
@@ -34,9 +34,12 @@ export default class Bot extends Client {
 		});
 	}
 
+	public get commands() {
+		return this._commands;
+	}
+
 	async init() {
-		this.commands = await this.commandLoader();
-		// TODO: actually register the commands
+		this._commands = await this.commandLoader();
 
 		this.events = await this.eventLoader();
 

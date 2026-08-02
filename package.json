@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "dist/index.js",
 	"scripts": {
+		"deploy:commands": "tsx --env-file=.env src/scripts/deployCommands.ts",
 		"build": "node --experimental-strip-types esbuild.config.ts",
 		"dev": "tsx --env-file=.env --watch src/index.ts",
 		"start": "node --env-file=.env dist/index.js"
