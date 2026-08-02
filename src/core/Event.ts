@@ -1,9 +1,10 @@
-import type { Client, ClientEvents } from "discord.js";
+import type { ClientEvents } from "discord.js";
+import type Bot from "./Bot";
 
 export interface BotEvent<T extends keyof ClientEvents = keyof ClientEvents> {
 	readonly name: T;
 	readonly once?: boolean;
-	execute(client: Client, ...args: ClientEvents[T]): Promise<void> | void;
+	execute(bot: Bot, ...args: ClientEvents[T]): Promise<void> | void;
 }
 
 export function isBotEvent(event: unknown): event is BotEvent {
