@@ -1,0 +1,79 @@
+import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { before, test } from "node:test";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+before(() => {
+	process.env.NODE_ENV = "production";
+	delete process.env.LOG_LEVEL;
+});
+
+test("resolveLogLevel defaults to debug in development", async () => {
+	const { resolveLogLevel } = await import("./logger");
+
+	assert.equal(resolveLogLevel({}), "debug");
+});
+
+test("resolveLogLevel defaults to info in production", async () => {
+	const { resolveLogLevel } = await import("./logger");
+
+	assert.equal(resolveLogLevel({ NODE_ENV: "production" }), "info");
+});
+
+test("resolveLogLevel honors LOG_LEVEL", async () => {
+	const { resolveLogLevel } = await import("./logger");
+
+	assert.equal(resolveLogLevel({ LOG_LEVEL: "warn" }), "warn");
+	assert.equal(
+		resolveLogLevel({ NODE_ENV: "production", LOG_LEVEL: "trace" }),
+		"trace",
+	);
+});
+
+test("createLogger returns a single shared logger per module name", async () => {
+	const { createLogger } = await import("./logger");
+
+	assert.equal(createLogger("shared"), createLogger("shared"));
+	assert.notEqual(createLogger("shared"), createLogger("other"));
+});
+
+test("createLogger binds the module name into emitted log lines", () => {
+	const loggerUrl = pathToFileURL(
+		join(dirname(fileURLToPath(import.meta.url)), "logger"),
+	).href;
+
+	const dir = mkdtempSync(join(tmpdir(), "logger-test-"));
+	const fixture = join(dir, "fixture.ts");
+
+	writeFileSync(
+		fixture,
+		[
+			`import { createLogger } from ${JSON.stringify(loggerUrl)};`,
+			`createLogger("first-module").info("first message");`,
+			`createLogger("second-module").info("second message");`,
+		].join("\n"),
+	);
+
+	try {
+		const stdout = execFileSync(
+			process.execPath,
+			["--import", "tsx", fixture],
+			{ encoding: "utf8", env: { ...process.env, NODE_ENV: "production" } },
+		);
+
+		const lines = stdout
+			.trim()
+			.split("\n")
+			.map((line) => JSON.parse(line));
+
+		assert.equal(lines[0].module, "first-module");
+		assert.equal(lines[0].msg, "first message");
+		assert.equal(lines[1].module, "second-module");
+		assert.equal(lines[1].msg, "second message");
+	} finally {
+		rmSync(dir, { recursive: true, force: true });
+	}
+});

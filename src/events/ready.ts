@@ -1,11 +1,14 @@
 import { ActivityType, Events } from "discord.js";
 import type { BotEvent } from "../core/Event";
+import { createLogger } from "../core/logger";
+
+const logger = createLogger("ready");
 
 const readyEvent: BotEvent<Events.ClientReady> = {
 	name: Events.ClientReady,
 	once: true,
 	execute(_, client) {
-		console.log(`Logged in as ${client.user.tag}`);
+		logger.info("Logged in as %s", client.user.tag);
 
 		client.user.setPresence({
 			activities: [
