@@ -2,6 +2,9 @@
 import { REST, Routes } from "discord.js";
 import { config } from "../config";
 import commandLoader from "../core/loaders/commandLoader";
+import { createLogger } from "../core/logger";
+
+const logger = createLogger("deployCommands");
 
 const commands = Array.from((await commandLoader()).values()).map((cmd) =>
 	cmd.data.toJSON(),
@@ -10,8 +13,9 @@ const commands = Array.from((await commandLoader()).values()).map((cmd) =>
 const rest = new REST().setToken(process.env.BOT_TOKEN as string);
 
 try {
-	console.log(
-		`Started refreshing ${commands.length} application (/) commands.`,
+	logger.info(
+		"Started refreshing %d application (/) commands.",
+		commands.length,
 	);
 
 	// global commands register
@@ -20,10 +24,11 @@ try {
 	});
 
 	if (typeof data === "object" && data !== null && "length" in data) {
-		console.log(
-			`Successfully reloaded ${data.length} application (/) commands.`,
+		logger.info(
+			"Successfully reloaded %d application (/) commands.",
+			Number(data.length),
 		);
 	}
 } catch (error) {
-	console.error(error);
+	logger.error(error, "Failed to refresh application (/) commands.");
 }

@@ -1,5 +1,8 @@
 import { Events, MessageFlags } from "discord.js";
 import type { BotEvent } from "../core/Event";
+import { createLogger } from "../core/logger";
+
+const logger = createLogger("interactionCreate");
 
 const interactionDispatcher: BotEvent<Events.InteractionCreate> = {
 	name: Events.InteractionCreate,
@@ -13,7 +16,11 @@ const interactionDispatcher: BotEvent<Events.InteractionCreate> = {
 			try {
 				await command.execute(bot, interaction);
 			} catch (error) {
-				console.error(error);
+				logger.error(
+					error,
+					"Error executing command %s",
+					interaction.commandName,
+				);
 
 				if (interaction.replied || interaction.deferred) {
 					await interaction.followUp({

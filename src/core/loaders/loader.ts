@@ -6,6 +6,9 @@ import type { Command } from "../Command";
 import { isCommand } from "../Command";
 import type { BotEvent } from "../Event";
 import { isBotEvent } from "../Event";
+import { createLogger } from "../logger";
+
+const logger = createLogger("loader");
 
 /**
  * expected directory structure:
@@ -61,6 +64,6 @@ async function loadFile(
 		if (isBotEvent(item)) collection.set(item.name, item);
 		else if (isCommand(item)) collection.set(item.data.name, item);
 	} catch (error) {
-		console.log(`[ERROR] Failed to import at ${filePath}: ${error}`);
+		logger.error(error, "Failed to import %s", filePath);
 	}
 }
