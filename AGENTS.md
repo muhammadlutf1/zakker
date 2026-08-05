@@ -1,3 +1,7 @@
+## Coding preferences
+
+- Don't specify return types that TypeScript can infer (e.g. `: void`, `: number`, `: boolean`). Only annotate where inference wouldn't be accurate or the type isn't otherwise named.
+
 ## Agent skills
 
 ### Issue tracker
